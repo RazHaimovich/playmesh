@@ -3,6 +3,11 @@
   "private": true,
   "version": "0.1.0",
   "description": "Build multiplayer worlds, not networking infrastructure.",
+  "homepage": "https://playmesh.dev",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/RazHaimovich/playmesh"
+  },
   "license": "MIT",
   "workspaces": [
     "packages/*"

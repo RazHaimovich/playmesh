@@ -1,6 +1,6 @@
 {
   "name": "@playmesh/server",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "PlayMesh multiplayer server framework — Socket.IO, Redis and BullMQ infrastructure for multiplayer worlds.",
   "keywords": [
     "multiplayer",
@@ -10,6 +10,12 @@
     "redis",
     "websocket"
   ],
+  "homepage": "https://playmesh.dev",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/RazHaimovich/playmesh",
+    "directory": "packages/server"
+  },
   "license": "MIT",
   "type": "module",
   "main": "./dist/index.cjs",

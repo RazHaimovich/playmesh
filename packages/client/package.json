@@ -1,6 +1,6 @@
 {
   "name": "@playmesh/client",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "PlayMesh client SDK — connect games and applications to PlayMesh servers.",
   "keywords": [
     "multiplayer",
@@ -9,6 +9,12 @@
     "game-client",
     "websocket"
   ],
+  "homepage": "https://playmesh.dev",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/RazHaimovich/playmesh",
+    "directory": "packages/client"
+  },
   "license": "MIT",
   "type": "module",
   "main": "./dist/index.cjs",
