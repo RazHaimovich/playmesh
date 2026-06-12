@@ -1,6 +1,6 @@
 {
   "name": "@playmesh/server",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "PlayMesh multiplayer server framework — Socket.IO, Redis and BullMQ infrastructure for multiplayer worlds.",
   "keywords": [
     "multiplayer",
