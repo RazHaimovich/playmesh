@@ -22,7 +22,7 @@ export interface ServerError {
 }
 
 export interface PlayMeshClientOptions {
-  /** Server URL, e.g. `wss://game.example.com` or `http://localhost:3000`. */
+  /** Server URL, e.g. `https://game.example.com` or `http://localhost:3000`. */
   url: string;
   /**
    * Auth payload passed to the server's authentication hook, or a

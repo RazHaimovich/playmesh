@@ -64,7 +64,7 @@ Used by games and applications to communicate with PlayMesh servers: connection 
 import { PlayMeshClient } from '@playmesh/client';
 
 const client = new PlayMeshClient({
-  url: 'wss://game.example.com'
+  url: 'https://game.example.com'
 });
 
 await client.connect();

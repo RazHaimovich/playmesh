@@ -29,7 +29,7 @@ npm install @playmesh/client
 import { PlayMeshClient } from '@playmesh/client';
 
 const client = new PlayMeshClient({
-  url: 'wss://game.example.com',
+  url: 'https://game.example.com',
   auth: { token: 'user-jwt-token' }
 });
 
@@ -59,7 +59,7 @@ client.onReconnect(() => {
 
 ```ts
 const client = new PlayMeshClient({
-  url: 'wss://game.example.com'
+  url: 'https://game.example.com'
 });
 ```
 
@@ -67,7 +67,7 @@ const client = new PlayMeshClient({
 
 ```ts
 const client = new PlayMeshClient({
-  url: 'wss://game.example.com',
+  url: 'https://game.example.com',
   auth: {
     token: 'jwt-token-or-session-id',
     userId: 'player1'
@@ -81,7 +81,7 @@ Pass a function to re-evaluate auth on every connection attempt:
 
 ```ts
 const client = new PlayMeshClient({
-  url: 'wss://game.example.com',
+  url: 'https://game.example.com',
   auth: async () => ({ token: await authService.getToken() })
 });
 ```
@@ -92,7 +92,7 @@ Reconnection and other Socket.IO options are passed under `socket`:
 
 ```ts
 const client = new PlayMeshClient({
-  url: 'wss://game.example.com',
+  url: 'https://game.example.com',
   socket: {
     reconnection: true,
     reconnectionDelay: 1000,
@@ -110,7 +110,7 @@ const client = new PlayMeshClient({
 
 | Option | Type | Description |
 |--------|------|-------------|
-| `url` | `string` | Server URL, e.g. `wss://game.example.com` or `http://localhost:3000` |
+| `url` | `string` | Server URL, e.g. `https://game.example.com` or `http://localhost:3000` |
 | `auth` | `Record<string, unknown> \| () => Record<string, unknown>` | Auth payload sent to the server's authentication hook |
 | `socket` | `Partial<ManagerOptions & SocketOptions>` | Options forwarded to the underlying Socket.IO client |
 
@@ -152,7 +152,7 @@ Passed to `onError()` handlers.
 ### Multiplayer Chat
 
 ```ts
-const client = new PlayMeshClient({ url: 'wss://chat.example.com' });
+const client = new PlayMeshClient({ url: 'https://chat.example.com' });
 await client.connect();
 
 client.on('chat', (data) => {
@@ -165,7 +165,7 @@ client.emit('send-message', { text: 'Hello everyone!' });
 ### Game World
 
 ```ts
-const client = new PlayMeshClient({ url: 'wss://game.example.com' });
+const client = new PlayMeshClient({ url: 'https://game.example.com' });
 await client.connect();
 
 client.on('player:update', (player) => {
