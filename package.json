@@ -1,0 +1,23 @@
+{
+  "name": "playmesh",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Build multiplayer worlds, not networking infrastructure.",
+  "license": "MIT",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "example:chat:server": "tsx examples/chat/server.mts",
+    "example:chat:client": "tsx examples/chat/client.mts"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.2"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

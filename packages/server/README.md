@@ -18,38 +18,34 @@ PlayMesh multiplayer server framework — Socket.IO, Redis and BullMQ infrastruc
 ## Installation
 
 ```bash
-npm install @playmesh/server socket.io ioredis bullmq
+npm install @playmesh/server
 ```
+
+`socket.io`, `ioredis`, and `bullmq` are bundled as dependencies — no need to install them separately.
 
 ## Quick Start
 
 ```ts
 import { PlayMesh } from '@playmesh/server';
 
-// Create a PlayMesh instance
-const mesh = new PlayMesh({
-  io: socketIOInstance,
-  // Optional: configure Redis for multi-node deployments
-  redis: {
-    host: 'localhost',
-    port: 6379
-  }
+const mesh = new PlayMesh();
+
+const world = mesh.createDomain('world');
+const city = world.createInstance('city-center');
+
+city.onJoin(session => {
+  console.log(`Player ${session.userId} joined`);
 });
 
-// Define a domain
-const gameDomain = await mesh.domain('game');
-
-// Create an instance (e.g., a game world)
-const instance = await gameDomain.instance('world-1');
-
-// Handle player connections
-instance.on('player:join', (session) => {
-  console.log(`Player ${session.id} joined`);
+city.onLeave(session => {
+  console.log(`Player ${session.userId} left`);
 });
 
-instance.on('player:leave', (session) => {
-  console.log(`Player ${session.id} left`);
+city.on('chat', (session, payload) => {
+  city.broadcast('chat', { sender: session.userId, message: payload });
 });
+
+await mesh.start();
 ```
 
 ## Core Concepts
@@ -67,15 +63,15 @@ const mesh = new PlayMesh();
 A logical grouping of related multiplayer experiences (e.g., lobby, ranked, open-world, marketplace).
 
 ```ts
-const domain = await mesh.domain('lobby');
+const domain = mesh.createDomain('lobby');
 ```
 
 ### Instance
 
-A specific multiplayer environment within a domain (e.g., a specific game world, match, or chat room).
+A specific multiplayer environment within a domain (e.g., a game world, match, or chat room).
 
 ```ts
-const instance = await domain.instance('world-1');
+const instance = domain.createInstance('world-1');
 ```
 
 ### Session
@@ -83,9 +79,8 @@ const instance = await domain.instance('world-1');
 An authenticated user connection with lifecycle management.
 
 ```ts
-instance.on('player:join', (session) => {
-  // Access session properties
-  console.log(session.id, session.userId, session.metadata);
+instance.onJoin(session => {
+  console.log(session.id, session.userId, session.data);
 });
 ```
 
@@ -93,10 +88,10 @@ instance.on('player:join', (session) => {
 
 ### Single-Node (Development)
 
-For development without Redis, PlayMesh runs in single-node mode with in-memory state:
+Redis is optional. Omit it to run in single-node mode with in-memory state and presence:
 
 ```ts
-const mesh = new PlayMesh({ io: socketIO });
+const mesh = new PlayMesh();
 ```
 
 ### Multi-Node (Production)
@@ -105,7 +100,6 @@ Configure Redis for multi-node deployments:
 
 ```ts
 const mesh = new PlayMesh({
-  io: socketIO,
   redis: {
     host: 'localhost',
     port: 6379,
@@ -114,31 +108,96 @@ const mesh = new PlayMesh({
 });
 ```
 
+Redis can also be passed as a connection URL string:
+
+```ts
+const mesh = new PlayMesh({ redis: process.env.REDIS_URL });
+```
+
+### Port
+
+```ts
+const mesh = new PlayMesh({ port: 4000 });
+```
+
 ## API Reference
 
 ### PlayMesh
 
-- `domain(name: string)` — Access or create a domain
-- `instance(domainName: string, instanceName: string)` — Access or create an instance
-- `message(target, event, data)` — Send targeted messages
+**Constructor options** (`PlayMeshOptions`):
+
+| Option | Type | Description |
+|--------|------|-------------|
+| `port` | `number` | Port to listen on. Defaults to `3000`. |
+| `server` | `HttpServer` | Optional pre-created HTTP server to attach to. |
+| `redis` | `RedisOptions \| string` | Redis connection. Omit for single-node in-memory mode. |
+| `socket` | `Partial<ServerOptions>` | Options forwarded to the underlying Socket.IO server. |
+
+**Topology:**
+
+- `createDomain(id: string): Domain` — Create a new domain
+- `domain(id: string): Domain` — Access an existing domain (throws if not found)
+- `hasDomain(id: string): boolean` — Check if a domain exists
+- `resolveInstance(ref: string | Instance): Instance` — Resolve a `domainId/instanceId` path or bare instance id
+
+**Hooks:**
+
+- `bootstrap(hook)` — Run async setup before the server accepts connections
+- `onAuthenticate(hook)` — Validate client credentials; return `{ userId, data? }`
+- `onAdmission(hook)` — Decide which instances a session joins on connect; return `{ instances }`
+- `onSessionCreate(hook)` — Called when a session is created
+- `onConnect(hook)` — Called after a session fully connects
+- `onDisconnect(hook)` — Called when a session disconnects
+- `onStarted(hook)` — Called after the server starts
+- `onShutdown(hook)` — Called during graceful shutdown
+
+**Messaging:**
+
+- `broadcast(event, payload?)` — Send an event to every connected session across all nodes
+
+**Other:**
+
+- `use(extension)` — Register a middleware function or install a plugin
+- `metrics(): Metrics` — Returns `{ sessions, domains, instances, uptimeMs }`
+- `start(): Promise<{ port: number }>` — Start the server
+- `shutdown(): Promise<void>` — Gracefully shut down
+- `io` — The underlying Socket.IO server (available after `start()`)
+- `redis` — The shared Redis client (throws if Redis is not configured)
+- `queues` — BullMQ queue manager (throws if Redis is not configured)
 
 ### Domain
 
-- `instance(name: string)` — Access or create an instance within the domain
-- `broadcast(event, data)` — Broadcast to all instances in the domain
+- `createInstance(id: string): Instance` — Create a new instance
+- `instance(id: string): Instance` — Access an existing instance (throws if not found)
+- `hasInstance(id: string): boolean` — Check if an instance exists
+- `destroyInstance(id: string): Promise<void>` — Destroy an instance and evict all sessions
+- `broadcast(event, payload?)` — Broadcast to all sessions in any instance of this domain
+- `onInstanceCreated(hook)` — Called when an instance is created
+- `onInstanceDestroyed(hook)` — Called when an instance is destroyed
 
 ### Instance
 
-- `broadcast(event, data)` — Broadcast to all sessions in the instance
-- `message(sessionId, event, data)` — Send to a specific session
-- `presence()` — Get current presence information
+- `on(event, handler)` — Handle an event sent by clients in this instance; `handler(session, payload)`
+- `off(event, handler)` — Remove a handler
+- `onJoin(hook)` — Called when a session joins this instance
+- `onLeave(hook)` — Called when a session leaves this instance
+- `broadcast(event, payload?)` — Send an event to all sessions in this instance across all nodes
+- `memberCount(): Promise<number>` — Number of member sessions across all nodes (presence-backed)
+- `path` — Globally unique reference in `domainId/instanceId` form
+- `sessions` — Sessions on this node that are members of this instance
+- `state` — Synchronized runtime state scoped to this instance
 
 ### Session
 
-- `id` — Unique session identifier
-- `userId` — Associated user ID (from authentication)
-- `metadata` — Custom session metadata
-- `send(event, data)` — Send event to this session
+- `id` — Unique session identifier (socket id)
+- `userId` — User ID returned by the authentication hook
+- `data` — Custom data attached by the authentication hook
+- `instances` — Instances this session is currently a member of
+- `join(instance): Promise<void>` — Join an instance
+- `leave(instance): Promise<void>` — Leave an instance
+- `isIn(instance): boolean` — Check if the session is a member of an instance
+- `send(event, payload?)` — Send an event to this client only
+- `disconnect()` — Forcibly disconnect this client
 
 ## Building
 
