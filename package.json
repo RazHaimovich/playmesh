@@ -20,6 +20,7 @@
     "example:chat:client": "tsx examples/chat/client.mts"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.31.0",
     "tsx": "^4.19.2"
   },
   "engines": {
