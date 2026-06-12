@@ -2,6 +2,11 @@
 
 PlayMesh multiplayer server framework — Socket.IO, Redis and BullMQ infrastructure for multiplayer worlds.
 
+[![npm](https://img.shields.io/npm/v/@playmesh/server)](https://www.npmjs.com/package/@playmesh/server)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+**[Website](https://playmesh.dev)** · **[GitHub](https://github.com/RazHaimovich/playmesh)** · **[npm](https://www.npmjs.com/package/@playmesh/server)**
+
 ## Overview
 
 `@playmesh/server` is the core server framework for building scalable multiplayer games, virtual worlds, social experiences, and real-time collaborative applications. It provides:

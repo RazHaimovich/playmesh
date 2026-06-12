@@ -2,6 +2,11 @@
 
 PlayMesh client SDK — connect games and applications to PlayMesh servers.
 
+[![npm](https://img.shields.io/npm/v/@playmesh/client)](https://www.npmjs.com/package/@playmesh/client)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+**[Website](https://playmesh.dev)** · **[GitHub](https://github.com/RazHaimovich/playmesh)** · **[npm](https://www.npmjs.com/package/@playmesh/client)**
+
 ## Overview
 
 `@playmesh/client` is the client-side SDK for communicating with PlayMesh servers. It provides:

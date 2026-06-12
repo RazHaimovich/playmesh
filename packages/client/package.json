@@ -1,6 +1,6 @@
 {
   "name": "@playmesh/client",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "PlayMesh client SDK — connect games and applications to PlayMesh servers.",
   "keywords": [
     "multiplayer",
